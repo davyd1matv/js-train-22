@@ -7,7 +7,7 @@ class AuthProcessor {
     return processor;
   }
 
-  valodate(username, passkey) {
+  validate(username, passkey) {
     if (this.nextProcessor) {
       return this.nextProcessor.validate(username, passkey);
     } else {
@@ -53,6 +53,7 @@ class RoleProcessor extends AuthProcessor {
   validate(username, passkey) {
     if (username === "guest") {
       console.log(`Вхід дозволено з роллю гостя`);
+      return true;
     } else {
       return super.validate(username, passkey);
     }
@@ -68,6 +69,7 @@ class CredentialsProcessor extends AuthProcessor {
   validate(username, passkey) {
     if (username === "admin" && passkey === "admin123") {
       console.log(`Вхід дозволено за обліковими даними`);
+      return true;
     } else {
       return super.validate(username, passkey);
     }
@@ -86,13 +88,15 @@ class ProcessorBuilder {
   }
 
   add(processor) {
-    if (this.firstProcessor) {
+    if (!this.firstProcessor) {
       this.firstProcessor = processor;
       this.lastProcessor = processor;
     } else {
       this.lastProcessor.setNextProcessor(processor);
       this.lastProcessor = processor;
     }
+
+    return this;
   }
 
   create() {
